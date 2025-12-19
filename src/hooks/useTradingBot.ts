@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 
+export interface BrokerConfig {
+  broker: 'MT4' | 'MT5';
+  lotSize: number;
+  timeframe: string;
+  accountId?: string;
+}
+
 interface Trade {
   id: string;
   type: 'BUY' | 'SELL';
@@ -15,6 +22,8 @@ interface Trade {
 
 interface TradingState {
   isAutoTrading: boolean;
+  isConfigured: boolean;
+  brokerConfig: BrokerConfig | null;
   currentPrice: number;
   previousPrice: number;
   balance: number;
@@ -30,11 +39,12 @@ const INITIAL_BALANCE = 10000;
 const BASE_GOLD_PRICE = 2650;
 const TAKE_PROFIT_PIPS = 50; // $50 per lot
 const STOP_LOSS_PIPS = 30;
-const LOT_SIZE = 0.1;
 
 export const useTradingBot = () => {
   const [state, setState] = useState<TradingState>({
     isAutoTrading: false,
+    isConfigured: false,
+    brokerConfig: null,
     currentPrice: BASE_GOLD_PRICE,
     previousPrice: BASE_GOLD_PRICE,
     balance: INITIAL_BALANCE,
@@ -125,13 +135,14 @@ export const useTradingBot = () => {
         if (newState.activeTrades.length < 3 && Math.random() > 0.7) {
           const trend = prev.currentPrice > prev.previousPrice;
           const tradeType = trend ? 'BUY' : 'SELL';
+          const lotSize = prev.brokerConfig?.lotSize || 0.1;
           
           const newTrade: Trade = {
             id: Date.now().toString(),
             type: tradeType,
             openPrice: prev.currentPrice,
             currentPrice: prev.currentPrice,
-            lots: LOT_SIZE,
+            lots: lotSize,
             profit: 0,
             openTime: new Date(),
             status: 'OPEN',
@@ -181,8 +192,10 @@ export const useTradingBot = () => {
   }, []);
 
   const resetAccount = useCallback(() => {
-    setState({
+    setState(prev => ({
       isAutoTrading: false,
+      isConfigured: prev.isConfigured,
+      brokerConfig: prev.brokerConfig,
       currentPrice: BASE_GOLD_PRICE,
       previousPrice: BASE_GOLD_PRICE,
       balance: INITIAL_BALANCE,
@@ -192,7 +205,15 @@ export const useTradingBot = () => {
       totalProfit: 0,
       winRate: 0,
       totalTrades: 0,
-    });
+    }));
+  }, []);
+
+  const configureBroker = useCallback((config: BrokerConfig) => {
+    setState(prev => ({
+      ...prev,
+      isConfigured: true,
+      brokerConfig: config,
+    }));
   }, []);
 
   return {
@@ -200,5 +221,6 @@ export const useTradingBot = () => {
     toggleAutoTrading,
     closeAllTrades,
     resetAccount,
+    configureBroker,
   };
 };

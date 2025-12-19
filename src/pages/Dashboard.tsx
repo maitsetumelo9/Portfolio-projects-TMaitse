@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import StatCard from '@/components/StatCard';
 import PriceDisplay from '@/components/PriceDisplay';
 import TradesTable from '@/components/TradesTable';
+import BrokerConfigModal, { BrokerConfig } from '@/components/BrokerConfigModal';
 import { 
   Flame, 
   Power, 
@@ -16,7 +17,10 @@ import {
   Target,
   BarChart3,
   XCircle,
-  RotateCcw
+  RotateCcw,
+  Monitor,
+  Clock,
+  Layers
 } from 'lucide-react';
 import dragonBg from '@/assets/dragon-bg.jpg';
 
@@ -25,6 +29,8 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const {
     isAutoTrading,
+    isConfigured,
+    brokerConfig,
     currentPrice,
     previousPrice,
     balance,
@@ -37,6 +43,7 @@ const Dashboard: React.FC = () => {
     toggleAutoTrading,
     closeAllTrades,
     resetAccount,
+    configureBroker,
   } = useTradingBot();
 
   const handleLogout = () => {
@@ -44,8 +51,18 @@ const Dashboard: React.FC = () => {
     navigate('/');
   };
 
+  const handleBrokerConfig = (config: BrokerConfig) => {
+    configureBroker(config);
+  };
+
   return (
     <div className="min-h-screen relative">
+      {/* Broker Configuration Modal */}
+      <BrokerConfigModal 
+        isOpen={!isConfigured} 
+        onConfigure={handleBrokerConfig} 
+      />
+
       {/* Background */}
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat -z-10"
@@ -154,18 +171,32 @@ const Dashboard: React.FC = () => {
                 <Activity className="h-5 w-5 text-primary" />
                 Trading Settings
               </h3>
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-secondary/50 rounded-lg p-4">
+                  <p className="text-muted-foreground text-sm mb-1 flex items-center gap-1">
+                    <Monitor className="h-3 w-3" /> Platform
+                  </p>
+                  <p className="text-gold font-display font-bold text-xl">{brokerConfig?.broker || 'N/A'}</p>
+                </div>
+                <div className="bg-secondary/50 rounded-lg p-4">
+                  <p className="text-muted-foreground text-sm mb-1 flex items-center gap-1">
+                    <Layers className="h-3 w-3" /> Lot Size
+                  </p>
+                  <p className="text-foreground font-display font-bold text-xl">{brokerConfig?.lotSize?.toFixed(2) || '0.10'}</p>
+                </div>
+                <div className="bg-secondary/50 rounded-lg p-4">
+                  <p className="text-muted-foreground text-sm mb-1 flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> Timeframe
+                  </p>
+                  <p className="text-foreground font-display font-bold text-xl">{brokerConfig?.timeframe || 'M15'}</p>
+                </div>
                 <div className="bg-secondary/50 rounded-lg p-4">
                   <p className="text-muted-foreground text-sm mb-1">Take Profit</p>
-                  <p className="text-foreground font-display font-bold text-xl">$50/lot</p>
+                  <p className="text-success font-display font-bold text-xl">$50/lot</p>
                 </div>
                 <div className="bg-secondary/50 rounded-lg p-4">
                   <p className="text-muted-foreground text-sm mb-1">Stop Loss</p>
-                  <p className="text-foreground font-display font-bold text-xl">$30/lot</p>
-                </div>
-                <div className="bg-secondary/50 rounded-lg p-4">
-                  <p className="text-muted-foreground text-sm mb-1">Lot Size</p>
-                  <p className="text-foreground font-display font-bold text-xl">0.10</p>
+                  <p className="text-destructive font-display font-bold text-xl">$30/lot</p>
                 </div>
               </div>
             </div>

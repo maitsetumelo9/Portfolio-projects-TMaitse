@@ -18,8 +18,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Demo credentials
 const DEMO_USERS = [
-  { id: '1', email: 'admin@phoenixea.com', password: 'Phoenix2024!', name: 'Admin' },
-  { id: '2', email: 'trader@phoenixea.com', password: 'Trader2024!', name: 'Trader' },
+  { id: '1', email: 'maitsetumelo9@gmail.com', password: 'Phoenix@2024', name: 'Admin' },
+  { id: '2', email: 'maitsetumelo9@gmail.com', password: 'Maitse@2024', name: 'Trader' },
 ];
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

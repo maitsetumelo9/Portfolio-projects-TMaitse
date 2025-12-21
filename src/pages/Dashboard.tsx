@@ -30,6 +30,7 @@ const Dashboard: React.FC = () => {
   const {
     isAutoTrading,
     isConfigured,
+    isConnected,
     brokerConfig,
     currentPrice,
     previousPrice,
@@ -40,6 +41,8 @@ const Dashboard: React.FC = () => {
     totalProfit,
     winRate,
     totalTrades,
+    lastError,
+    apiLoading,
     toggleAutoTrading,
     closeAllTrades,
     resetAccount,
@@ -124,6 +127,19 @@ const Dashboard: React.FC = () => {
             <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-success/20 border border-success/50 rounded-lg">
               <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
               <span className="text-success font-semibold">Bot Active</span>
+            </div>
+          )}
+
+          {isConnected && !isAutoTrading && (
+            <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/50 rounded-lg">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <span className="text-primary font-semibold">MT5 Connected</span>
+            </div>
+          )}
+
+          {lastError && (
+            <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-destructive/20 border border-destructive/50 rounded-lg">
+              <span className="text-destructive text-sm">{lastError}</span>
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,14 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Flame, Monitor, Clock, Layers, Link2 } from 'lucide-react';
+import { Flame, Monitor, Clock, Layers, Link2, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { useMetaAPI, MetaAPIAccount } from '@/hooks/useMetaAPI';
+import { toast } from 'sonner';
 
 export interface BrokerConfig {
   broker: 'MT4' | 'MT5';
   lotSize: number;
   timeframe: string;
-  accountId?: string;
+  accountId: string;
+  accountName?: string;
 }
 
 interface BrokerConfigModalProps {
@@ -53,27 +55,53 @@ const BrokerConfigModal: React.FC<BrokerConfigModalProps> = ({
   isOpen,
   onConfigure,
 }) => {
-  const [broker, setBroker] = useState<'MT4' | 'MT5' | ''>('');
+  const [selectedAccountId, setSelectedAccountId] = useState('');
   const [lotSize, setLotSize] = useState('0.10');
   const [timeframe, setTimeframe] = useState('M15');
-  const [accountId, setAccountId] = useState('');
   const [step, setStep] = useState(1);
+  
+  const { loading, error, accounts, fetchAccounts, deployAccount } = useMetaAPI();
 
-  const handleConnect = () => {
-    if (broker && lotSize && timeframe) {
-      onConfigure({
-        broker: broker as 'MT4' | 'MT5',
-        lotSize: parseFloat(lotSize),
-        timeframe,
-        accountId: accountId || undefined,
-      });
+  useEffect(() => {
+    if (isOpen) {
+      fetchAccounts();
     }
+  }, [isOpen, fetchAccounts]);
+
+  const selectedAccount = accounts.find(acc => acc._id === selectedAccountId);
+
+  const handleConnect = async () => {
+    if (!selectedAccount) return;
+    
+    // Deploy account if not already deployed
+    if (selectedAccount.state !== 'DEPLOYED') {
+      toast.info('Deploying MT5 account...');
+      try {
+        await deployAccount(selectedAccountId);
+        toast.success('Account deployment started. This may take a few moments.');
+      } catch (err) {
+        toast.error('Failed to deploy account');
+        return;
+      }
+    }
+
+    onConfigure({
+      broker: selectedAccount.platform.toUpperCase() as 'MT4' | 'MT5',
+      lotSize: parseFloat(lotSize),
+      timeframe,
+      accountId: selectedAccountId,
+      accountName: selectedAccount.name,
+    });
   };
 
   const canProceed = () => {
-    if (step === 1) return broker !== '';
+    if (step === 1) return selectedAccountId !== '';
     if (step === 2) return lotSize !== '' && timeframe !== '';
     return true;
+  };
+
+  const handleRefresh = () => {
+    fetchAccounts();
   };
 
   return (
@@ -87,7 +115,7 @@ const BrokerConfigModal: React.FC<BrokerConfigModalProps> = ({
             </DialogTitle>
           </div>
           <DialogDescription className="text-muted-foreground">
-            Configure your trading connection to get started
+            Connect your MT5 account via MetaAPI
           </DialogDescription>
         </DialogHeader>
 
@@ -106,28 +134,74 @@ const BrokerConfigModal: React.FC<BrokerConfigModalProps> = ({
 
           {step === 1 && (
             <div className="space-y-4">
-              <h3 className="font-display text-lg text-foreground flex items-center gap-2">
-                <Monitor className="h-5 w-5 text-primary" />
-                Which broker platform are you using?
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  variant={broker === 'MT4' ? 'gold' : 'outline'}
-                  className="h-24 flex-col gap-2"
-                  onClick={() => setBroker('MT4')}
-                >
-                  <Monitor className="h-8 w-8" />
-                  <span className="font-display text-lg">MetaTrader 4</span>
-                </Button>
-                <Button
-                  variant={broker === 'MT5' ? 'gold' : 'outline'}
-                  className="h-24 flex-col gap-2"
-                  onClick={() => setBroker('MT5')}
-                >
-                  <Monitor className="h-8 w-8" />
-                  <span className="font-display text-lg">MetaTrader 5</span>
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-lg text-foreground flex items-center gap-2">
+                  <Monitor className="h-5 w-5 text-primary" />
+                  Select MetaAPI Account
+                </h3>
+                <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={loading}>
+                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 </Button>
               </div>
+
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2 text-muted-foreground">Loading accounts...</span>
+                </div>
+              )}
+
+              {error && (
+                <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                  <p className="text-destructive text-sm">{error}</p>
+                </div>
+              )}
+
+              {!loading && accounts.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">
+                    No MetaAPI accounts found. Please add your MT5 account in the MetaAPI dashboard first.
+                  </p>
+                  <Button variant="outline" asChild>
+                    <a href="https://app.metaapi.cloud" target="_blank" rel="noopener noreferrer">
+                      Open MetaAPI Dashboard
+                    </a>
+                  </Button>
+                </div>
+              )}
+
+              {!loading && accounts.length > 0 && (
+                <div className="space-y-2">
+                  {accounts.map((account: MetaAPIAccount) => (
+                    <button
+                      key={account._id}
+                      onClick={() => setSelectedAccountId(account._id)}
+                      className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                        selectedAccountId === account._id
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border bg-secondary/50 hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-foreground">{account.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {account.platform.toUpperCase()} • Login: {account.login} • {account.server}
+                          </p>
+                        </div>
+                        <div className={`px-2 py-1 rounded text-xs font-semibold ${
+                          account.state === 'DEPLOYED' 
+                            ? 'bg-success/20 text-success' 
+                            : 'bg-warning/20 text-warning'
+                        }`}>
+                          {account.state}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -173,31 +247,24 @@ const BrokerConfigModal: React.FC<BrokerConfigModalProps> = ({
             </div>
           )}
 
-          {step === 3 && (
+          {step === 3 && selectedAccount && (
             <div className="space-y-4">
               <h3 className="font-display text-lg text-foreground flex items-center gap-2">
                 <Link2 className="h-5 w-5 text-primary" />
-                Connect to {broker}
+                Ready to Connect
               </h3>
-              
-              <div className="space-y-3">
-                <Label className="text-foreground">Account ID (Optional)</Label>
-                <Input
-                  placeholder="Enter your broker account ID"
-                  value={accountId}
-                  onChange={(e) => setAccountId(e.target.value)}
-                  className="bg-secondary border-border"
-                />
-                <p className="text-xs text-muted-foreground">
-                  This is for display purposes. The bot will simulate trading on XAUUSD.
-                </p>
-              </div>
 
               <div className="bg-secondary/50 rounded-lg p-4 space-y-2 border border-border">
                 <h4 className="font-semibold text-foreground">Configuration Summary</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
+                  <span className="text-muted-foreground">Account:</span>
+                  <span className="text-gold font-semibold">{selectedAccount.name}</span>
                   <span className="text-muted-foreground">Platform:</span>
-                  <span className="text-gold font-semibold">{broker}</span>
+                  <span className="text-gold font-semibold">{selectedAccount.platform.toUpperCase()}</span>
+                  <span className="text-muted-foreground">Login:</span>
+                  <span className="text-foreground">{selectedAccount.login}</span>
+                  <span className="text-muted-foreground">Server:</span>
+                  <span className="text-foreground">{selectedAccount.server}</span>
                   <span className="text-muted-foreground">Lot Size:</span>
                   <span className="text-foreground">{lotSize}</span>
                   <span className="text-muted-foreground">Timeframe:</span>
@@ -206,6 +273,15 @@ const BrokerConfigModal: React.FC<BrokerConfigModalProps> = ({
                   <span className="text-gold">XAUUSD (Gold)</span>
                 </div>
               </div>
+
+              {selectedAccount.state !== 'DEPLOYED' && (
+                <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/30 rounded-lg">
+                  <AlertCircle className="h-4 w-4 text-warning" />
+                  <p className="text-warning text-sm">
+                    Account will be deployed when you connect.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -226,7 +302,8 @@ const BrokerConfigModal: React.FC<BrokerConfigModalProps> = ({
               Continue
             </Button>
           ) : (
-            <Button variant="gold" onClick={handleConnect}>
+            <Button variant="gold" onClick={handleConnect} disabled={loading}>
+              {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               <Link2 className="h-4 w-4 mr-2" />
               Connect & Start Trading
             </Button>

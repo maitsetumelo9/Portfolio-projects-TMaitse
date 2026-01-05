@@ -3,10 +3,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, auth-token',
 };
-
-const METAAPI_ACCESS_TOKEN = Deno.env.get('METAAPI_ACCESS_TOKEN');
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -18,12 +16,13 @@ serve(async (req) => {
     const { action, accountId, ...params } = await req.json();
     console.log(`MetaAPI action: ${action}, accountId: ${accountId}`);
 
-    if (!METAAPI_ACCESS_TOKEN) {
+    const metaApiAccessToken = (Deno.env.get('METAAPI_ACCESS_TOKEN') ?? '').trim();
+    if (!metaApiAccessToken) {
       throw new Error('MetaAPI access token not configured');
     }
 
     const headers = {
-      'auth-token': METAAPI_ACCESS_TOKEN,
+      'auth-token': metaApiAccessToken,
       'Content-Type': 'application/json',
     };
 

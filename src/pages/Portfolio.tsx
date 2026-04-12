@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { 
   Shield, Code, Terminal, Lock, Globe, Database, 
   Server, Eye, Bug, Wifi, ChevronDown, ExternalLink, 

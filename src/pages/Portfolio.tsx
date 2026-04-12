@@ -443,10 +443,10 @@ export default function Portfolio() {
           </div>
           
           <div className="flex justify-center gap-6">
-            <a href="#" className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:border-cyan-500/20 transition-all">
+            <a href="https://github.com/maitsetumelo" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:border-cyan-500/20 transition-all">
               <Github className="w-5 h-5" />
             </a>
-            <a href="#" className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:border-cyan-500/20 transition-all">
+            <a href="https://linkedin.com/in/maitsetumelo" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:border-cyan-500/20 transition-all">
               <Linkedin className="w-5 h-5" />
             </a>
           </div>

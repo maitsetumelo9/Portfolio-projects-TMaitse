@@ -33,7 +33,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<Index />} />
+    <Route path="/" element={<Portfolio />} />
+    <Route path="/trading" element={<Index />} />
     <Route path="/auth" element={<AuthPage />} />
     <Route path="/install" element={<InstallPage />} />
     <Route 

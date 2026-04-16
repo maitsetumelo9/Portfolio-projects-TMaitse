@@ -10,6 +10,12 @@ import Dashboard from "./pages/Dashboard";
 import InstallPage from "./pages/InstallPage";
 import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
+import CloudSyncDemo from "./pages/demos/CloudSyncDemo";
+import FinTrackDemo from "./pages/demos/FinTrackDemo";
+import PenTestDemo from "./pages/demos/PenTestDemo";
+import PhishGuardDemo from "./pages/demos/PhishGuardDemo";
+import NetSentinelDemo from "./pages/demos/NetSentinelDemo";
+import VaultKeeperDemo from "./pages/demos/VaultKeeperDemo";
 
 const queryClient = new QueryClient();
 

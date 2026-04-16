@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { 
   Shield, Code, Terminal, Lock, Globe, Database, 
@@ -24,7 +25,8 @@ const projects = [
     ],
     icon: Globe,
     gradient: "from-blue-500 to-cyan-400",
-    accent: "blue"
+    accent: "blue",
+    demoPath: "/demo/cloudsync"
   },
   {
     id: 2,
@@ -41,7 +43,8 @@ const projects = [
     ],
     icon: Database,
     gradient: "from-emerald-500 to-teal-400",
-    accent: "emerald"
+    accent: "emerald",
+    demoPath: "/demo/fintrack"
   },
   {
     id: 3,
@@ -58,7 +61,8 @@ const projects = [
     ],
     icon: Bug,
     gradient: "from-red-500 to-orange-400",
-    accent: "red"
+    accent: "red",
+    demoPath: "/demo/pentest"
   },
   {
     id: 4,
@@ -75,7 +79,8 @@ const projects = [
     ],
     icon: Eye,
     gradient: "from-amber-500 to-yellow-400",
-    accent: "amber"
+    accent: "amber",
+    demoPath: "/demo/phishguard"
   },
   {
     id: 5,
@@ -92,7 +97,8 @@ const projects = [
     ],
     icon: Shield,
     gradient: "from-violet-500 to-purple-400",
-    accent: "violet"
+    accent: "violet",
+    demoPath: "/demo/netsentinel"
   },
   {
     id: 6,
@@ -109,7 +115,8 @@ const projects = [
     ],
     icon: Lock,
     gradient: "from-pink-500 to-rose-400",
-    accent: "pink"
+    accent: "pink",
+    demoPath: "/demo/vaultkeeper"
   }
 ];
 
@@ -131,6 +138,7 @@ const skills = {
 const navLinks = ["About", "Skills", "Projects", "Certifications", "Contact"];
 
 export default function Portfolio() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
   const [expandedProject, setExpandedProject] = useState<number | null>(null);
 
@@ -380,12 +388,14 @@ export default function Portfolio() {
                           ))}
                         </ul>
                         <div className="flex gap-3 mt-6">
-                          <Button size="sm" className={`bg-gradient-to-r ${project.gradient} text-white border-0 hover:opacity-90`}>
+                          <Button size="sm" onClick={(e) => { e.stopPropagation(); navigate(project.demoPath); }} className={`bg-gradient-to-r ${project.gradient} text-white border-0 hover:opacity-90`}>
                             <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Live Demo
                           </Button>
-                          <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5">
-                            <Github className="w-3.5 h-3.5 mr-1.5" /> Source Code
-                          </Button>
+                          <a href="https://github.com/maitsetumelo" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+                            <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5">
+                              <Github className="w-3.5 h-3.5 mr-1.5" /> Source Code
+                            </Button>
+                          </a>
                         </div>
                       </div>
                     )}

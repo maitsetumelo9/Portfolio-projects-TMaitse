@@ -388,12 +388,14 @@ export default function Portfolio() {
                           ))}
                         </ul>
                         <div className="flex gap-3 mt-6">
-                          <Button size="sm" className={`bg-gradient-to-r ${project.gradient} text-white border-0 hover:opacity-90`}>
+                          <Button size="sm" onClick={(e) => { e.stopPropagation(); navigate(project.demoPath); }} className={`bg-gradient-to-r ${project.gradient} text-white border-0 hover:opacity-90`}>
                             <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Live Demo
                           </Button>
-                          <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5">
-                            <Github className="w-3.5 h-3.5 mr-1.5" /> Source Code
-                          </Button>
+                          <a href="https://github.com/maitsetumelo" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+                            <Button size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-white/5">
+                              <Github className="w-3.5 h-3.5 mr-1.5" /> Source Code
+                            </Button>
+                          </a>
                         </div>
                       </div>
                     )}

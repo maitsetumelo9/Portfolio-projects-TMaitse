@@ -25,7 +25,8 @@ const projects = [
     ],
     icon: Globe,
     gradient: "from-blue-500 to-cyan-400",
-    accent: "blue"
+    accent: "blue",
+    demoPath: "/demo/cloudsync"
   },
   {
     id: 2,

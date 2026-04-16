@@ -138,6 +138,7 @@ const skills = {
 const navLinks = ["About", "Skills", "Projects", "Certifications", "Contact"];
 
 export default function Portfolio() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
   const [expandedProject, setExpandedProject] = useState<number | null>(null);
 

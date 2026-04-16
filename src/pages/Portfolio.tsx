@@ -43,7 +43,8 @@ const projects = [
     ],
     icon: Database,
     gradient: "from-emerald-500 to-teal-400",
-    accent: "emerald"
+    accent: "emerald",
+    demoPath: "/demo/fintrack"
   },
   {
     id: 3,
@@ -60,7 +61,8 @@ const projects = [
     ],
     icon: Bug,
     gradient: "from-red-500 to-orange-400",
-    accent: "red"
+    accent: "red",
+    demoPath: "/demo/pentest"
   },
   {
     id: 4,
@@ -77,7 +79,8 @@ const projects = [
     ],
     icon: Eye,
     gradient: "from-amber-500 to-yellow-400",
-    accent: "amber"
+    accent: "amber",
+    demoPath: "/demo/phishguard"
   },
   {
     id: 5,
@@ -94,7 +97,8 @@ const projects = [
     ],
     icon: Shield,
     gradient: "from-violet-500 to-purple-400",
-    accent: "violet"
+    accent: "violet",
+    demoPath: "/demo/netsentinel"
   },
   {
     id: 6,
@@ -111,7 +115,8 @@ const projects = [
     ],
     icon: Lock,
     gradient: "from-pink-500 to-rose-400",
-    accent: "pink"
+    accent: "pink",
+    demoPath: "/demo/vaultkeeper"
   }
 ];
 
